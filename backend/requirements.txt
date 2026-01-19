@@ -1,0 +1,8 @@
+fastapi # web framework for building apis with python 
+uvicorn # server that runs fastapi applications
+python-multipart # for handling file uploads in fastapi
+requests # for making http requests
+httpx # for making async http requests
+python-dotenv # for loading environment variables from a .env file
+supabase # pyhton client for supabase 
+deepgram-sdk # sdk for interacting with deepgram api
