@@ -18,18 +18,25 @@ ELEVEN_TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech"
 
 async def transcribe_with_deepgram(audio_data: bytes):
     """Action 1: Transcribe Urdu audio using Deepgram."""
-    options = {
-        "model": "nova-2", 
-        "language": "ur", 
-        "smart_format": True
-    }
-    
     start_time = time.time()
-    response = await dg_client.listen.prerecorded.v("1").transcribe(
-        {"buffer": audio_data}, options
+    response = dg_client.listen.v1.media.transcribe_file(
+        request=audio_data,
+        model="whisper-large",
+        language="ur",
+        smart_format=True
     )
     transcription_time = time.time() - start_time
+    
+    # Debug: Check response structure
+    if not response.results or not response.results.channels:
+        raise ValueError(f"No channels in response: {response}")
+    
+    if not response.results.channels[0].alternatives:
+        raise ValueError(f"No alternatives in channel: {response.results.channels[0]}")
+    
     text = response.results.channels[0].alternatives[0].transcript
+    
+    # text = response.results.channels[0].alternatives[0].transcript
     
     return text, transcription_time
 

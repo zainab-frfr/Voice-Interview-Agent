@@ -1,0 +1,638 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Font size settings */
+.font-small { font-size: 14px; }
+.font-medium { font-size: 16px; }
+.font-large { font-size: 18px; }
+
+/* Dark and light mode settings */
+/* Default is light mode */
+.light-mode { 
+  background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%); 
+  color: black;
+}
+.dark-mode { 
+  background: linear-gradient(180deg, #2C2C2C 20%, #000000 100%); 
+  color: white;
+}
+
+/* Language settings */
+.urdu { 
+  direction: rtl; 
+  font-family: "Noto Nastaliq Urdu", serif; 
+}
+.roman { 
+  direction: ltr; 
+  font-family: Arial, sans-serif; 
+}
+.english { 
+  direction: ltr; 
+  font-family: Arial, sans-serif; 
+}
+
+/* Landing container */
+.landing-container {
+  position: relative;
+  min-height: 100vh;   /* ✅ allows growth */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+
+/* Hamburger menu settings */
+.hamburger-menu {
+  position: fixed;   /* ✅ */
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+
+/* Urdu/RTL override */
+.lang-urdu .hamburger-menu {
+  left: auto;
+  right: 20px;
+}
+
+/* Hamburger button */
+.hamburger-button {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+}
+
+.hamburger-button:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.hamburger-button:active {
+  transform: translateY(0);
+}
+
+.dark-mode .hamburger-button {
+  background: #3a3a3a;
+  color: white;
+}
+
+
+
+/* Menu dropdown */
+.menu-dropdown {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+}
+
+.dark-mode .menu-dropdown {
+  background: #3a3a3a;
+  color: white;
+}
+
+.lang-urdu .menu-dropdown {
+  left: auto;
+  right: 0;
+}
+
+.menu-section {
+  margin-bottom: 16px;
+}
+
+.menu-section:last-child {
+  margin-bottom: 0;
+}
+
+.menu-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+.menu-section button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.menu-section button:hover {
+  background: #e0e0e0;
+  transform: translateX(2px);
+}
+
+.menu-section button:active {
+  transform: scale(0.98);
+}
+
+.dark-mode .menu-section button {
+  background: #2a2a2a;
+  color: white;
+}
+
+.dark-mode .menu-section button:hover {
+  background: #404040;
+}
+
+/* Center content */
+.content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  padding-top: 90px;     /* space for hamburger */
+  padding-bottom: 140px; /* space for mic button */
+}
+
+
+.content-center h1 {
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Urdu specific title styling */
+.urdu .content-center h1 {
+  font-family: "Noto Nastaliq Urdu", serif;
+  font-size: 4rem;
+  font-weight: 400;
+}
+
+.start-button {
+  padding: 18px 60px;
+  font-size: 1.1rem;
+  background: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.start-button:hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.start-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .start-button {
+  background: white;
+  color: #2a2a2a;
+}
+
+.dark-mode .start-button:hover {
+  background: #f0f0f0;
+}
+
+button.mic-button,
+.mic-button {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  margin: 32px 0;
+}
+
+.mic-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.mic-button:active {
+  transform: scale(0.95);
+}
+
+.mic-button svg {
+  color: white;
+}
+
+
+/* Dark mode - reverse colors */
+.dark-mode .mic-button {
+  background: white;
+}
+
+.dark-mode .mic-button svg {
+  color: #2a2a2a;
+}
+
+/* Add these styles to your index.css */
+
+/* Image Container Styles */
+.image-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Single Image Layout (Q15, Q15a, Q15b) */
+.image-container.single-image {
+  flex-direction: column;
+}
+
+.image-container.single-image .product-image {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  object-fit: contain;
+}
+
+/* Double Image Layout (Q17) */
+.image-container.double-image {
+  flex-direction: row;
+  gap: 30px;
+}
+
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 350px;
+}
+
+.image-wrapper .product-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.image-wrapper .product-image:hover {
+  transform: scale(1.02);
+}
+
+.image-label {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Light mode image labels */
+.light-mode .image-label {
+  background: rgba(42, 42, 42, 0.1);
+  color: #2a2a2a;
+}
+
+/* Dark mode image labels */
+.dark-mode .image-label {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Responsive Design for Images */
+@media (max-width: 768px) {
+  .image-container.double-image {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .image-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .image-container.single-image .product-image {
+    max-width: 90%;
+  }
+
+  .image-wrapper .product-image {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-container {
+    margin: 15px 0;
+  }
+
+  .image-label {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+} 
+
+
+/* ===============================
+   INTERVIEW PAGE ENHANCEMENTS
+================================ */
+
+/* Interview heading spacing fix */
+.interview-heading {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.urdu .interview-heading {
+  font-family: "Noto Nastaliq Urdu", serif;
+  font-weight: 400;
+}
+
+/* Progress container spacing */
+.progress-container {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.progress-text {
+  font-size: 14px;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dark-mode .progress-bar-bg {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+/* ===============================
+   MIC BUTTON STATE CONTROL
+================================ */
+
+.mic-button.playing {
+  background: #1565c0;
+}
+
+.mic-button.recording {
+  background: #c62828;
+}
+
+.dark-mode .mic-button.playing {
+  background: #90caf9;
+}
+
+.dark-mode .mic-button.recording {
+  background: #ef9a9a;
+}
+
+/* Disable hover while busy */
+.mic-button.processing,
+.mic-button.playing {
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===============================
+   SPEAKING WAVE ANIMATION
+================================ */
+
+.wave-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.wave-icon span {
+  width: 8px;
+  height: 28px;
+  background: white;
+  border-radius: 4px;
+  animation: waveMove 1.2s infinite ease-in-out;
+}
+
+.wave-icon span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.wave-icon span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes waveMove {
+  0%, 100% {
+    height: 16px;
+    opacity: 0.6;
+  }
+  50% {
+    height: 36px;
+    opacity: 1;
+  }
+}
+
+.dark-mode .wave-icon span {
+  background: #2a2a2a;
+}
+
+/* ===============================
+   PROCESSING SPINNER
+================================ */
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.dark-mode .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.3);
+  border-top: 4px solid #2a2a2a;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===============================
+   QUESTION TEXT + TYPING EFFECT
+================================ */
+
+.question-caption {
+  margin-top: 24px;
+  max-width: 720px;
+  text-align: center;
+}
+
+.question-caption h2 {
+  font-size: 1.4rem;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.urdu .question-caption h2 {
+  font-family: "Noto Nastaliq Urdu", serif;
+  font-size: 1.6rem;
+  line-height: 2.2;
+}
+
+.typing::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ===============================
+   TRANSCRIPTION BOX
+================================ */
+
+.transcription-box {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.dark-mode .transcription-box {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.transcription-box h3 {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+/* ===============================
+   ERROR MESSAGE
+================================ */
+
+.error-text {
+  margin-top: 12px;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+/* ===============================
+   MOBILE TWEAKS
+================================ */
+
+@media (max-width: 480px) {
+  .mic-button {
+    width: 130px;
+    height: 130px;
+  }
+
+  .question-caption h2 {
+    font-size: 1.2rem;
+  }
+}
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .content-center h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .urdu .content-center h1 {
+    font-size: 3rem;
+  }
+  
+  .start-button {
+    padding: 16px 50px;
+    font-size: 1rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .content-center h1 {
+    font-size: 2rem;
+  }
+  
+  .urdu .content-center h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hamburger-button {
+    width: 45px;
+    height: 45px;
+  }
+}
