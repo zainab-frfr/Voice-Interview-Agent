@@ -1,0 +1,20 @@
+# Environment Variables (CRITICAL)
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Project Specifics
+results/
+*.csv
