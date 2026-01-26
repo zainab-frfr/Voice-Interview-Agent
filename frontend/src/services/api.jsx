@@ -1,7 +1,7 @@
 // api.jsx
 
 // Base API URL (from .env or fallback)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "https://wrong-layney-a2z2-5a17c1e7.koyeb.app";
 
 // Enable ngrok header only when explicitly set in .env
 // Add this in your .env:  VITE_USE_NGROK_SKIP=true
