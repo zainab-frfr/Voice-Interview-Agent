@@ -26,6 +26,7 @@ A full-stack prototype of a real-time voice interaction agent. This project is s
    cd prototype
 
 2. **Set up Backend**
+   ```bash
    cd backend 
    pip install -r requirements.txt 
 
@@ -36,6 +37,8 @@ A full-stack prototype of a real-time voice interaction agent. This project is s
 
 
 3. **Set up Frontend**
+
+   ```bash
    cd frontend 
    npm install 
 
