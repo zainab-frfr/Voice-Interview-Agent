@@ -1,11 +1,8 @@
-Here is the full Markdown code for your `backend/README.md`. You can copy this directly into your file.
-
-```markdown
 # 🎙️ Voice Interview Agent - Backend
 
 This is the Python-based brain of the Voice Interview Agent. It uses **FastAPI** for the web server, **Deepgram** for Urdu transcription, **ElevenLabs** for voice synthesis, and **Supabase** for data and audio storage.
 
----
+--- 
 
 ## 🏗️ Architecture: The "Ear-Brain-Mouth" Pipeline
 
@@ -14,8 +11,6 @@ The backend handles the heavy lifting of processing audio and managing data thro
 1.  **Speech-to-Text (STT):** Receives `.wav` files from the frontend and uses **Deepgram (Whisper Large)** with specific Urdu (`ur`) language settings to ensure high transcription accuracy.
 2.  **Parallel Storage:** Uses `asyncio.gather` to simultaneously upload raw audio to **Supabase Storage** and log metadata/transcripts into the `interview_responses` table.
 3.  **Voice Synthesis (TTS):** Uses **ElevenLabs (Multilingual V2)** to convert survey questions into natural-sounding Urdu audio, which is then streamed back to the frontend.
-
-
 
 ---
 
@@ -75,5 +70,3 @@ uvicorn main:app --reload
 * **Urdu Support:** Transcription is optimized using the `whisper-large` model for the `ur` language code.
 * **Performance:** The `/stt` endpoint uses asynchronous processing to ensure audio uploads don't block the transcription return.
 * **CSV Encoding:** Reports are exported with `utf-8-sig` encoding to ensure Urdu script displays correctly in Microsoft Excel.
-
----
