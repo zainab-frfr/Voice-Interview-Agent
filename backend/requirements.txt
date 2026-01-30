@@ -7,3 +7,4 @@ httpx # for making async http requests
 python-dotenv # for loading environment variables from a .env file
 supabase # pyhton client for supabase 
 deepgram-sdk # sdk for interacting with deepgram api
+edge-tts

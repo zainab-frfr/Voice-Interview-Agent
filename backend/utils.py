@@ -13,7 +13,7 @@ dg_client = DeepgramClient(api_key=DEEPGRAM_API_KEY)
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_API_KEY"))
 
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID = "90ipbRoKi4CpHXvKVtl0"
+VOICE_ID = "XrExE9yKIg1WjnnlVkGX" #"90ipbRoKi4CpHXvKVtl0"
 ELEVEN_TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech"
 
 async def transcribe_with_deepgram(audio_data: bytes):

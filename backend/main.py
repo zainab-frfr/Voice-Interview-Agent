@@ -5,6 +5,11 @@ import asyncio, io
 from pydantic import BaseModel
 from utils import *
 from survey_data import QUESTIONS # the questions 
+from urllib.parse import unquote
+import io
+import edge_tts
+from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
 
 # load_dotenv()
 
@@ -92,26 +97,53 @@ async def transcribe_audio(
         print(f"Error in STT Endpoint: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-
 @app.post("/tts")
 async def generate_tts(text: str = Query(...)):
     if not text:
         raise HTTPException(status_code=400, detail="Text required")
 
     try:
-        response = await call_elevenlabs_api(text)
+        # 'ur-PK-UzmaNeural' is a very clear, natural female Urdu voice
+        # 'ur-PK-AsadNeural' is the male version
+        voice = "ur-PK-UzmaNeural"
         
-        if response.status_code != 200:
-             raise HTTPException(status_code=response.status_code, detail="ElevenLabs Error")
+        communicate = edge_tts.Communicate(text, voice)
+        
+        # We collect the audio in an internal buffer
+        audio_data = b""
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_data += chunk["data"]
 
-        # streaming directly from memory
-        audio_stream = io.BytesIO(response.content)
+        if not audio_data:
+            raise Exception("No audio data generated")
 
+        audio_stream = io.BytesIO(audio_data)
         return StreamingResponse(audio_stream, media_type="audio/mpeg")
 
     except Exception as e:
-        print(f"TTS Error: {e}")
+        print(f"Edge-TTS Error: {e}")
         raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")
+    
+# @app.post("/tts")
+# async def generate_tts(text: str = Query(...)):
+#     if not text:
+#         raise HTTPException(status_code=400, detail="Text required")
+
+#     try:
+#         response = await call_elevenlabs_api(text)
+        
+#         if response.status_code != 200:
+#              raise HTTPException(status_code=response.status_code, detail="ElevenLabs Error")
+
+#         # streaming directly from memory
+#         audio_stream = io.BytesIO(response.content)
+
+#         return StreamingResponse(audio_stream, media_type="audio/mpeg")
+
+#     except Exception as e:
+#         print(f"TTS Error: {e}")
+#         raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")
 
 @app.post("/start-interview")
 async def start_interview(data: InterviewStart):
