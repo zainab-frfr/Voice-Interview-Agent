@@ -1,12 +1,12 @@
-import time, os, uuid, httpx, csv, io, json
+import time, os, uuid, httpx, csv,  json, re
 from deepgram import DeepgramClient
 # from deepgram.listen.v1.media import PrerecordedOptions
 from supabase import create_client
 from datetime import datetime
 from dotenv import load_dotenv
-import whisper
-import torch, re
-import tempfile
+# import whisper
+# import torch, io
+# import tempfile
 from groq import Groq
 
 # Load the model globally to avoid reloading on every request
