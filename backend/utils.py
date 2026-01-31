@@ -110,7 +110,7 @@ IMPORTANT LANGUAGE RULES:
   * 6: 'چھ', 'chhe', 'chhay', 'سکس'
   * 7: 'سات', 'saat', 'ساتھ' (common mistake), 'سیون'
   * 8: 'آٹھ', 'aath', 'ایٹ'
-  * 9: 'نو', 'nau', 'no', 'نائیں', 'نائن', نا
+  * 9: 'نو', 'nau', 'no','نہیں' 'نائیں', 'نائن', نا
 
 Question: "{question}"
 Answer: "{answer}"
@@ -207,7 +207,7 @@ def get_sentiment_response(answer):
         'چھ': '6', 'chhe': '6', 'chhay': '6', 'سکس': '6',
         'سات': '7', 'saat': '7', 'ساتھ': '7', 'سیون': '7',
         'آٹھ': '8', 'aath': '8', 'ایٹ': '8',
-        'نو': '9', 'nau': '9', 'no': '9', 'نائیں': '9', 'نائن': '9'
+        'نو': '9', 'nau': '9', 'no': '9', 'نائیں': '9', 'نائن': '9', 'نہیں': '9', 'نا': '9'
     }
 
     # Urdu digits to English digits mapping
