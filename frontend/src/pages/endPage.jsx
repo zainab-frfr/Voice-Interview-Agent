@@ -13,6 +13,11 @@ export default function EndPage() {
     <div className="landing-container">
       <HamburgerMenu />
       
+      {/* Company Name */}
+      <div className="company-name">
+        powered by <span className="company-name-bold">InsightAI.</span>
+      </div>
+
       <div className="content-center">
         <h1>{t("end_message")}</h1>
         

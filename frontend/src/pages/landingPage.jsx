@@ -18,6 +18,11 @@ export default function LandingPage() {
     <div className="landing-container">
       <HamburgerMenu />
       
+      {/* Company Name */}
+      <div className="company-name">
+        powered by <span className="company-name-bold">InsightAI.</span>
+      </div>
+
       <div className="content-center">
         <h1>{t("welcome_message")}</h1>
         <button className="start-button" onClick={startInterview}>

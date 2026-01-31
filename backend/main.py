@@ -6,10 +6,11 @@ from pydantic import BaseModel
 from utils import *
 from survey_data import QUESTIONS # the questions 
 from urllib.parse import unquote
-import io
+import io, re
 import edge_tts
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
+from gtts import gTTS
 
 # load_dotenv()
 
@@ -77,7 +78,27 @@ async def transcribe_audio(
         # Unpack the results
         (text, duration) = results[0]
         file_url = results[1]
-
+        
+        print(text)
+        
+        json_groq_response = validate_answer(question=question_text, answer=text)
+        if json_groq_response.get("category") == "valid":
+            if question_type == "follow-up":
+                sentiment = get_sentiment_response(answer=text)
+                if sentiment == "like":
+                    next_qes_id = int(question_id) + 2
+                elif sentiment == "dislike":
+                    next_qes_id = int(question_id) + 1
+                else:
+                    next_qes_id = int(question_id) 
+                    json_groq_response["message"] = "براہِ مہربانی 1 سے 9 کے درمیان نمبر بولیں۔"
+            else:
+                next_qes_id = int(question_id) + 1
+        elif json_groq_response.get("category") == "refusal": # end interview 
+            next_qes_id = int(question_id)
+        else: # stay on current qs, ask message 
+            next_qes_id = int(question_id)
+            
         # Now that we have both the text and the URL, save to DB
         response_payload = {
             "session_id": session_id,
@@ -87,43 +108,63 @@ async def transcribe_audio(
             "answer_text": text,
             "transcription_time": round(duration, 2),
             "audio_file_url": file_url,
-            "response_order": response_order
+            "response_order": response_order,
         }
         await save_metadata_to_db(response_payload)
+        
+        
+            # "next_qes_id": next_qes_id,
+            # "message": json_groq_response.get("message", "")
+        response_payload["next_qes_id"] = next_qes_id
+        response_payload["message"] = json_groq_response.get("message", "")
 
-        return {"success": True, "text": text, "audio_url": file_url}
+        return {"success": True, **response_payload}
 
     except Exception as e:
         print(f"Error in STT Endpoint: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 @app.post("/tts")
 async def generate_tts(text: str = Query(...)):
     if not text:
         raise HTTPException(status_code=400, detail="Text required")
 
+    # Try Edge-TTS first
     try:
-        # 'ur-PK-UzmaNeural' is a very clear, natural female Urdu voice
-        # 'ur-PK-AsadNeural' is the male version
         voice = "ur-PK-UzmaNeural"
-        
         communicate = edge_tts.Communicate(text, voice)
         
-        # We collect the audio in an internal buffer
+        # Collect audio in buffer
         audio_data = b""
         async for chunk in communicate.stream():
             if chunk["type"] == "audio":
                 audio_data += chunk["data"]
 
         if not audio_data:
-            raise Exception("No audio data generated")
+            raise Exception("No audio data generated from Edge-TTS")
 
+        print(f"Edge-TTS Success: {len(audio_data)} bytes")
         audio_stream = io.BytesIO(audio_data)
         return StreamingResponse(audio_stream, media_type="audio/mpeg")
 
     except Exception as e:
-        print(f"Edge-TTS Error: {e}")
-        raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")
+        print(f"Edge-TTS failed: {e}. Falling back to gTTS...")
+        
+        # Fallback to gTTS
+        try:
+            from gtts import gTTS
+            
+            tts = gTTS(text=text, lang='ur', slow=False)
+            audio_buffer = io.BytesIO()
+            tts.write_to_fp(audio_buffer)
+            audio_buffer.seek(0)
+            
+            print(f"gTTS Success: {len(audio_buffer.getvalue())} bytes")
+            return StreamingResponse(audio_buffer, media_type="audio/mpeg")
+
+        except Exception as gtts_error:
+            print(f"gTTS also failed: {gtts_error}")
+            raise HTTPException(status_code=500, detail=f"Both TTS services failed: {str(gtts_error)}")
     
 # @app.post("/tts")
 # async def generate_tts(text: str = Query(...)):
@@ -131,20 +172,28 @@ async def generate_tts(text: str = Query(...)):
 #         raise HTTPException(status_code=400, detail="Text required")
 
 #     try:
-#         response = await call_elevenlabs_api(text)
+#         # 'ur-PK-UzmaNeural' is a very clear, natural female Urdu voice
+#         # 'ur-PK-AsadNeural' is the male version
+#         voice = "ur-PK-UzmaNeural"
         
-#         if response.status_code != 200:
-#              raise HTTPException(status_code=response.status_code, detail="ElevenLabs Error")
+#         communicate = edge_tts.Communicate(text, voice)
+        
+#         # We collect the audio in an internal buffer
+#         audio_data = b""
+#         async for chunk in communicate.stream():
+#             if chunk["type"] == "audio":
+#                 audio_data += chunk["data"]
 
-#         # streaming directly from memory
-#         audio_stream = io.BytesIO(response.content)
+#         if not audio_data:
+#             raise Exception("No audio data generated")
 
+#         audio_stream = io.BytesIO(audio_data)
 #         return StreamingResponse(audio_stream, media_type="audio/mpeg")
 
 #     except Exception as e:
-#         print(f"TTS Error: {e}")
+#         print(f"Edge-TTS Error: {e}")
 #         raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")
-
+    
 @app.post("/start-interview")
 async def start_interview(data: InterviewStart):
     try:
@@ -218,3 +267,24 @@ async def generate_csv_for_session(session_id: str):
     except Exception as e:
         print(f"CSV Error: {e}")
         raise HTTPException(status_code=500, detail="CSV generation failed")
+    
+    
+# @app.post("/tts")
+# async def generate_tts(text: str = Query(...)):
+#     if not text:
+#         raise HTTPException(status_code=400, detail="Text required")
+
+#     try:
+#         response = await call_elevenlabs_api(text)
+        
+#         if response.status_code != 200:
+#              raise HTTPException(status_code=response.status_code, detail="ElevenLabs Error")
+
+#         # streaming directly from memory
+#         audio_stream = io.BytesIO(response.content)
+
+#         return StreamingResponse(audio_stream, media_type="audio/mpeg")
+
+#     except Exception as e:
+#         print(f"TTS Error: {e}")
+#         raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")

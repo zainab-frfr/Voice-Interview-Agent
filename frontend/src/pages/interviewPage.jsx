@@ -77,12 +77,14 @@ export default function InterviewPage() {
   };
 
   /* ---------------- Play Question Audio ---------------- */
-  const playQuestion = async (text) => {
+  const playQuestion = async (text, skipGestureWait = false) => {
     try {
       setIsPlayingAudio(true);
       setError('');
 
-      await waitForUserGesture();
+      if (!skipGestureWait) {
+        await waitForUserGesture();
+      }
 
       if (audioRef.current) {
         audioRef.current.pause();
@@ -110,7 +112,7 @@ export default function InterviewPage() {
   useEffect(() => {
     if (!currentQuestion) return;
 
-    const fullText = t(currentQuestion.id);
+    const fullText = t(currentQuestion.question_id);
     setAnimatedText('');
 
     if (!isPlayingAudio) {
@@ -176,46 +178,78 @@ export default function InterviewPage() {
       const result = await api.speechToText(
         audioBlob,
         sessionId,
-        q.id,
+        q.question_id,
         q.text,
         q.type,
         currentQuestionIndex
       );
 
       setTranscription(result.text);
-      setTimeout(goToNextQuestion, 2000);
+
+      // Check if we should stay on current question or move to next
+      const currentQId = parseInt(q.question_id);
+      const nextQId = result.next_qes_id;
+
+      if (currentQId === nextQId) {
+        // Same question - speak message and stay
+        if (result.message) {
+          await playQuestion(result.message, true);
+        }
+        setTranscription('');
+      } else {
+        // Move to next question
+        setTimeout(() => goToNextQuestion(nextQId), 250);
+      }
     } catch {
-      setError("Transcription failed");
+        setError("Transcription failed");
     } finally {
-      setIsProcessing(false);
+        setIsProcessing(false);
     }
   };
 
-  const goToNextQuestion = async () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      const nextIndex = currentQuestionIndex + 1;
+  const goToNextQuestion = async (nextQId) => {
+    const nextIndex = nextQId - 1; // Convert question ID to array index
+    
+    if (nextIndex < questions.length) {
       setCurrentQuestionIndex(nextIndex);
       setTranscription('');
+      setError('');
       await playQuestion(questions[nextIndex].text);
     } else {
       await api.completeInterview(sessionId);
       navigate('/end');
     }
   };
+  // const goToNextQuestion = async () => {
+  //   if (currentQuestionIndex < questions.length - 1) {
+  //     const nextIndex = currentQuestionIndex + 1;
+  //     setCurrentQuestionIndex(nextIndex);
+  //     setTranscription('');
+  //     await playQuestion(questions[nextIndex].text);
+  //   } else {
+  //     await api.completeInterview(sessionId);
+  //     navigate('/end');
+  //   }
+  // };
 
   const progress = questions.length
     ? ((currentQuestionIndex + 1) / questions.length) * 100
     : 0;
 
   // Check if current question requires images
-  const showSingleImage = currentQuestion && ['Q15', 'Q15a', 'Q15b'].includes(currentQuestion.id);
-  const showDoubleImage = currentQuestion && currentQuestion.id === 'Q17';
+  const showSingleImage = currentQuestion && ['Q15', 'Q15a', 'Q15b'].includes(currentQuestion.showSingleImage);
+  const showDoubleImage = currentQuestion && currentQuestion.showSingleImage === 'Q17';
 
   /* ---------------- UI ---------------- */
   return (
     <div className="landing-container interview-page">
       <audio ref={audioRef} />
       <HamburgerMenu />
+
+      {/* Company Name */}
+      <div className="company-name">
+        powered by <span className="company-name-bold">InsightAI.</span>
+      </div>
 
       <div className="content-center">
 

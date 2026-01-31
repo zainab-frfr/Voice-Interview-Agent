@@ -1,11 +1,26 @@
-import time, os, uuid, httpx, csv
+import time, os, uuid, httpx, csv, io, json
 from deepgram import DeepgramClient
 # from deepgram.listen.v1.media import PrerecordedOptions
 from supabase import create_client
 from datetime import datetime
 from dotenv import load_dotenv
+import whisper
+import torch, re
+import tempfile
+from groq import Groq
+
+# Load the model globally to avoid reloading on every request
+# 'large-v3' is the current state-of-the-art for local Whisper
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+# model = whisper.load_model("large-v3", device=device)
+
+# The URL where your Backend 2 is hosted
+WHISPER_SERVER_URL = "https://your-backend-2-url.com/transcribe"
 
 load_dotenv()
+
+# llm_client initialization
+llm_client = Groq(api_key= os.getenv("GROQ_API_KEY"))
 
 # Initialize Deepgram and supabase clients, and eleven labs constants 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
@@ -39,6 +54,188 @@ async def transcribe_with_deepgram(audio_data: bytes):
     # text = response.results.channels[0].alternatives[0].transcript
     
     return text, transcription_time
+
+async def transcribe_with_whisper(audio_data: bytes):
+    """
+    Action 1: Send audio to Backend 2 for Whisper transcription.
+    """
+    try:
+        # We use a long timeout because Whisper Large-v3 takes time to process
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            # Prepare the file for the multipart/form-data request
+            files = {'file': ('audio.wav', audio_data, 'audio/wav')}
+            
+            response = await client.post(WHISPER_SERVER_URL, files=files)
+            
+            if response.status_code != 200:
+                print(f"Transcription Server Error: {response.text}")
+                return "Transcription failed", 0.0
+            
+            data = response.json()
+            # Extract text and time from Backend 2's response
+            return data.get("text", ""), data.get("transcription_time", 0.0)
+
+    except Exception as e:
+        print(f"Error calling Backend 2: {e}")
+        return f"Error: {str(e)}", 0.0
+
+
+def validate_answer(question, answer):
+    """
+    Sends the question + user answer to Groq for validation.
+    Returns:
+      - valid: True/False
+      - category: response type
+      - message: guidance / explanation if needed
+      - api_time: time taken for API call in seconds
+    """
+
+    prompt = f"""
+You are an assistant that validates user responses to interview questions in Urdu.
+
+IMPORTANT LANGUAGE RULES:
+- NEVER use the phrase "براہِ کرم".
+- ALWAYS use "برائے مہربانی" instead.
+- you are a female interviewer so use FEMININE PRONOUNS WHERE NEEDED.
+- Maintain a polite, respectful, and neutral Urdu tone.
+- Respond in **URDU** only 
+- the answer might contain spelling mistakes (for eg. "ساتھ" instead of "سات") so take that into account while classifying.
+
+Question: "{question}"
+Answer: "{answer}"
+
+TASK:
+Classify the user's answer into ONE category:
+
+- valid (directly answers the question)
+- irrelevant
+- evasive
+- abusive
+- repeat (asking to repeat OR explain the question)
+- refusal (wants to stop or end the interview)
+
+SPECIAL RULES:
+
+1. VALID:
+- valid = true
+- message must be an empty string
+
+2. REPEAT:
+- Includes requests like:
+  "سوال دہرا دیں", "سوال سمجھ نہیں آیا", "کیا وضاحت کر سکتے ہیں"
+- Do NOT scold the user.
+- Apologize politely.
+- Briefly explain the question in simple Urdu.
+- Imply the question may not have been conveyed clearly.
+
+3. REFUSAL:
+- User wants to end the interview.
+- Respond politely and accept the request.
+- Do NOT ask them to answer again.
+
+4. OTHER INVALID TYPES:
+- Politely guide the user on how to answer.
+- Use "برائے مہربانی".
+
+OUTPUT:
+Return ONLY valid JSON in exactly this format:
+
+{{
+  "valid": true/false,
+  "category": "valid | irrelevant | evasive | abusive | repeat | refusal",
+  "message": "appropriate Urdu message or empty string"
+}}
+"""
+
+    # # Start timing
+    # start_time = time.time()
+
+    response = llm_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",  # or "mixtral-8x7b-32768"
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+
+    # End timing
+    # end_time = time.time()
+    # api_time = end_time - start_time
+
+    try:
+        output_text = response.choices[0].message.content.strip()
+        result = json.loads(output_text)
+        # result["api_time"] = api_time  # Add timing to result
+    except Exception:
+        result = {
+            "valid": False,
+            "category": "error",
+            "message": "برائے مہربانی دھرائیں  سسٹم جواب کو سمجھ نہیں سکا۔",
+            # "api_time": api_time
+        }
+
+    return result
+
+def get_sentiment_response(answer):
+    """
+    Function to ask a question and determine sentiment based on numeric response.
+
+    Args:
+        question (str): The question to ask the respondent
+
+    Returns:
+        str: Either "dislike" or "like" based on the numeric response
+    """
+
+    # Mapping of Urdu number words to digits
+    urdu_numbers = {
+        'ایک': '1', 'ek': '1',
+        'دو': '2', 'do': '2',
+        'تین': '3', 'teen': '3',
+        'چار': '4', 'char': '4', 'chaar': '4',
+        'پانچ': '5', 'panch': '5', 'paanch': '5',
+        'چھ': '6', 'chhe': '6', 'chhay': '6',
+        'سات': '7', 'saat': '7', 'ساتھ': '7',
+        'آٹھ': '8', 'aath': '8',
+        'نو': '9', 'nau': '9', 'no': '9'
+    }
+
+    # Urdu digits to English digits mapping
+    urdu_digits = {
+        '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5',
+        '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+    }
+
+    while True:
+        # the response from the user
+        response = answer.strip()
+
+        # Convert Urdu digits to English digits
+        for urdu_digit, english_digit in urdu_digits.items():
+            response = response.replace(urdu_digit, english_digit)
+
+        # Replace Urdu number words with English digits
+        response_lower = response.lower()
+        for urdu_word, digit in urdu_numbers.items():
+            response_lower = response_lower.replace(urdu_word, digit)
+
+        # Extract numeric value from response (1-9)
+        numbers = re.findall(r'\b[1-9]\b', response_lower)
+        print(numbers)
+
+        if numbers:
+            # Get the first valid number found
+            number = int(numbers[0])
+            print(number)
+
+            # Check if number is in valid range (1-9)
+            if 1 <= number <= 9:
+                if 1 <= number <= 4:
+                    return "dislike"
+                else:  # 5 to 9
+                    return "like"
+
+        # If no valid number found, ask again
+        return "invalid"
+
 
 async def upload_audio_to_supabase(session_id: str, question_id: str, audio_data: bytes):
     """Action 2: Upload raw audio to Supabase Storage and get public URL."""
