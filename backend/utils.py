@@ -99,7 +99,18 @@ IMPORTANT LANGUAGE RULES:
 - you are a female interviewer so use FEMININE PRONOUNS WHERE NEEDED.
 - Maintain a polite, respectful, and neutral Urdu tone.
 - Respond in **URDU** only 
-- the answer might contain spelling mistakes (for eg. "ساتھ" instead of "سات") so take that into account while classifying.
+- the answer might contain spelling mistakes so take that into account while classifying.
+- NUMERICAL INTERPRETATION:
+  Users may say or spell numbers in various ways. Map the following to their numerical meanings:
+  * 1: 'ایک', 'ek', 'ون'
+  * 2: 'دو', 'do', 'ٹو'
+  * 3: 'تین', 'teen', 'تھری'
+  * 4: 'چار', 'char', 'chaar', 'فور'
+  * 5: 'پانچ', 'panch', 'paanch', 'فائیو'
+  * 6: 'چھ', 'chhe', 'chhay', 'سکس'
+  * 7: 'سات', 'saat', 'ساتھ' (common mistake), 'سیون'
+  * 8: 'آٹھ', 'aath', 'ایٹ'
+  * 9: 'نو', 'nau', 'no', 'نائیں', 'نائن'
 
 Question: "{question}"
 Answer: "{answer}"
@@ -187,15 +198,15 @@ def get_sentiment_response(answer):
 
     # Mapping of Urdu number words to digits
     urdu_numbers = {
-        'ایک': '1', 'ek': '1',
-        'دو': '2', 'do': '2',
-        'تین': '3', 'teen': '3',
-        'چار': '4', 'char': '4', 'chaar': '4',
-        'پانچ': '5', 'panch': '5', 'paanch': '5',
-        'چھ': '6', 'chhe': '6', 'chhay': '6',
-        'سات': '7', 'saat': '7', 'ساتھ': '7',
-        'آٹھ': '8', 'aath': '8',
-        'نو': '9', 'nau': '9', 'no': '9'
+        'ایک': '1', 'ek': '1', 'ون': '1',
+        'دو': '2', 'do': '2', 'ٹو': '2',
+        'تین': '3', 'teen': '3', 'تھری': '3',
+        'چار': '4', 'char': '4', 'chaar': '4', 'فور': '4',
+        'پانچ': '5', 'panch': '5', 'paanch': '5', 'فائیو': '5',
+        'چھ': '6', 'chhe': '6', 'chhay': '6', 'سکس': '6',
+        'سات': '7', 'saat': '7', 'ساتھ': '7', 'سیون': '7',
+        'آٹھ': '8', 'aath': '8', 'ایٹ': '8',
+        'نو': '9', 'nau': '9', 'no': '9', 'نائیں': '9', 'نائن': '9'
     }
 
     # Urdu digits to English digits mapping
