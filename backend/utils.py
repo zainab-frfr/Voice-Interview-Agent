@@ -110,7 +110,7 @@ IMPORTANT LANGUAGE RULES:
   * 6: 'چھ', 'chhe', 'chhay', 'سکس'
   * 7: 'سات', 'saat', 'ساتھ' (common mistake), 'سیون'
   * 8: 'آٹھ', 'aath', 'ایٹ'
-  * 9: 'نو', 'nau', 'no', 'نائیں', 'نائن'
+  * 9: 'نو', 'nau', 'no', 'نائیں', 'نائن', نا
 
 Question: "{question}"
 Answer: "{answer}"
@@ -130,6 +130,7 @@ SPECIAL RULES:
 1. VALID:
 - valid = true
 - message must be an empty string
+- a response containing a denial word (e.g., "نہیں") is still valid if it directly answers the question.
 
 2. REPEAT:
 - Includes requests like:
