@@ -1,5 +1,5 @@
 # Environment Variables (CRITICAL)
-.env
+.env.local
 
 # Python Cache
 __pycache__/

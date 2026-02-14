@@ -1,0 +1,529 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  height: 100vh;
+  --primary-dark: #1a3a52;
+  --primary-light: #f0f5f9;
+  --accent-teal: #00a8cc;
+  --accent-dark: #0f2438;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* ===============================
+   DEFAULT TO LIGHT MODE
+================================ */
+html {
+  background: linear-gradient(180deg, #dfe5eb 0%, #d0dce5 100%);
+  color: #1a3a52;
+}
+
+/* ===============================
+   FONT SIZE SETTINGS
+================================ */
+.font-small {
+  font-size: 14px;
+}
+
+.font-medium {
+  font-size: 16px;
+}
+
+.font-large {
+  font-size: 18px;
+}
+
+/* ===============================
+   DARK AND LIGHT MODE
+================================ */
+.light-mode {
+  background: linear-gradient(180deg, #dfe5eb 0%, #d0dce5 100%);
+  color: #1a3a52;
+}
+
+.dark-mode {
+  background: linear-gradient(180deg, #1a3a52 20%, #0f2438 100%);
+  color: #f0f5f9;
+}
+
+/* ===============================
+   LANGUAGE SETTINGS
+================================ */
+.urdu {
+  direction: rtl;
+  font-family: "Noto Nastaliq Urdu", serif;
+}
+
+.roman {
+  direction: ltr;
+  font-family: Arial, sans-serif;
+}
+
+.english {
+  direction: ltr;
+  font-family: Arial, sans-serif;
+}
+
+/* ===============================
+   LANDING CONTAINER
+================================ */
+.landing-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* ===============================
+   HAMBURGER MENU
+================================ */
+.hamburger-menu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.lang-urdu .hamburger-menu {
+  left: auto;
+  right: 20px;
+}
+
+.hamburger-button {
+  background: #f0f5f9;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 58, 82, 0.15);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  color: #1a3a52;
+}
+
+.hamburger-button:hover {
+  box-shadow: 0 4px 12px rgba(0, 168, 204, 0.25);
+  transform: translateY(-2px);
+  background: #00a8cc;
+  color: #f0f5f9;
+}
+
+.dark-mode .hamburger-button {
+  background: #0f2438;
+  color: #00a8cc;
+  border: 2px solid #00a8cc;
+}
+
+/* ===============================
+   MENU DROPDOWN
+================================ */
+.menu-dropdown {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background: #f0f5f9;
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(26, 58, 82, 0.15);
+  min-width: 200px;
+  z-index: 1001;
+}
+
+.dark-mode .menu-dropdown {
+  background: #0f2438;
+  color: #f0f5f9;
+  border: 1px solid #00a8cc;
+}
+
+.lang-urdu .menu-dropdown {
+  left: auto;
+  right: 0;
+}
+
+.menu-section {
+  margin-bottom: 16px;
+}
+
+.menu-section:last-child {
+  margin-bottom: 0;
+}
+
+.menu-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0.7;
+  color: #1a3a52;
+}
+
+.dark-mode .menu-section h3 {
+  color: #00a8cc;
+}
+
+.menu-section button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border: none;
+  border-radius: 8px;
+  background: #e8f1f7;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #1a3a52;
+}
+
+.menu-section button:hover {
+  background: #00a8cc;
+  color: #f0f5f9;
+  transform: translateX(2px);
+}
+
+.dark-mode .menu-section button {
+  background: #1a3a52;
+  color: #f0f5f9;
+}
+
+.dark-mode .menu-section button:hover {
+  background: #00a8cc;
+  color: #0f2438;
+}
+
+/* ===============================
+   CONTENT CENTER
+================================ */
+.content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  height: 100vh;
+  max-width: 600px;
+  width: 100%;
+}
+
+.content-center h1 {
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #1a3a52;
+}
+
+.dark-mode .content-center h1 {
+  color: #00a8cc;
+}
+
+.urdu .content-center h1 {
+  font-family: "Noto Nastaliq Urdu", serif;
+  font-size: 4rem;
+  font-weight: 400;
+}
+
+/* ===============================
+   COMPANY NAME
+================================ */
+.company-name {
+  position: fixed;
+  top: 20px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #1a3a52;
+  letter-spacing: 0.5px;
+  z-index: 900;
+  direction: ltr;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.company-name-bold {
+  font-weight: 700;
+}
+
+.dark-mode .company-name {
+  color: #97ddeb;
+}
+
+.dark-mode .company-name-bold {
+  color: #00a8cc;
+}
+
+/* ===============================
+   START BUTTON
+================================ */
+.start-button {
+  padding: 18px 60px;
+  font-size: 1.1rem;
+  background: #1a3a52;
+  color: #f0f5f9;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(26, 58, 82, 0.3);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.start-button:hover {
+  background: #00a8cc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 168, 204, 0.3);
+}
+
+.start-button:active {
+  transform: translateY(0);
+}
+
+.dark-mode .start-button {
+  background: #00a8cc;
+  color: #0f2438;
+}
+
+.dark-mode .start-button:hover {
+  background: #f0f5f9;
+  color: #1a3a52;
+}
+
+/* ===============================
+   CONNECTING STATE
+================================ */
+.connecting-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.connecting-text {
+  font-size: 1.1rem;
+  color: #1a3a52;
+}
+
+.dark-mode .connecting-text {
+  color: #f0f5f9;
+}
+
+.spinner-large {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(26, 58, 82, 0.2);
+  border-top: 4px solid #00a8cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.dark-mode .spinner-large {
+  border: 4px solid rgba(0, 168, 204, 0.2);
+  border-top: 4px solid #00d9ff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===============================
+   MIC BUTTON - STATIC WHEN LISTENING
+================================ */
+.mic-button {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #1a3a52;
+  border: none;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(26, 58, 82, 0.3);
+  transition: background 0.3s ease;
+  color: #f0f5f9;
+  margin: 30px 0;
+}
+
+.mic-button:disabled {
+  opacity: 1;
+}
+
+.mic-button svg {
+  color: #f0f5f9;
+}
+
+.dark-mode .mic-button {
+  background: #00a8cc;
+  color: #0f2438;
+}
+
+.dark-mode .mic-button svg {
+  color: #0f2438;
+}
+
+/* ===============================
+   MIC BUTTON - WAVE ANIMATION WHEN AGENT SPEAKING
+================================ */
+.mic-button.speaking {
+  background: #00a8cc;
+}
+
+.dark-mode .mic-button.speaking {
+  background: #00d9ff;
+}
+
+.wave-icon {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 48px;
+}
+
+.wave-icon span {
+  width: 4px;
+  background: #f0f5f9;
+  border-radius: 2px;
+  animation: waveMove 0.8s ease-in-out infinite;
+}
+
+.wave-icon span:nth-child(1) {
+  height: 12px;
+  animation-delay: 0s;
+}
+
+.wave-icon span:nth-child(2) {
+  height: 24px;
+  animation-delay: 0.1s;
+}
+
+.wave-icon span:nth-child(3) {
+  height: 36px;
+  animation-delay: 0.2s;
+}
+
+.wave-icon span:nth-child(4) {
+  height: 24px;
+  animation-delay: 0.3s;
+}
+
+.wave-icon span:nth-child(5) {
+  height: 12px;
+  animation-delay: 0.4s;
+}
+
+@keyframes waveMove {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.dark-mode .wave-icon span {
+  background: #0f2438;
+}
+
+/* ===============================
+   INTERVIEW HEADING
+================================ */
+.interview-heading {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  text-align: center;
+  color: #1a3a52;
+}
+
+.dark-mode .interview-heading {
+  color: #00a8cc;
+}
+
+.urdu .interview-heading {
+  font-family: "Noto Nastaliq Urdu", serif;
+  font-weight: 400;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+================================ */
+@media (max-width: 768px) {
+  .content-center h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .urdu .content-center h1 {
+    font-size: 3rem;
+  }
+
+  .start-button {
+    padding: 16px 50px;
+    font-size: 1rem;
+  }
+
+  .mic-button {
+    width: 130px;
+    height: 130px;
+  }
+
+  .interview-heading {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-center h1 {
+    font-size: 2rem;
+  }
+
+  .urdu .content-center h1 {
+    font-size: 2.5rem;
+  }
+
+  .hamburger-button {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+
+  .interview-heading {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .mic-button {
+    width: 120px;
+    height: 120px;
+  }
+
+  .start-button {
+    padding: 14px 40px;
+    font-size: 0.95rem;
+  }
+}
