@@ -7,7 +7,7 @@ from livekit.plugins import groq, deepgram, silero, azure
 load_dotenv(".env.local")
 logger = logging.getLogger("insight-ai")
 server = AgentServer()
-
+ 
 # 1. Your Structured Questionnaire
 QUESTIONS = [
     {"id": "1", "text": "آپ کا جینڈر کیا ہے؟ مرد یا عورت", "type": "general"},
