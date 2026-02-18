@@ -3,9 +3,10 @@ import json
 import os
 import asyncio
 from dotenv import load_dotenv
+import time
 from livekit.agents import Agent, AgentServer, AgentSession, JobContext, cli, llm
 from livekit.plugins import groq, deepgram,  azure, silero
-from supabase import create_client, Client
+from supabase import create_client, Client, acreate_client, AsyncClient
 
 
 load_dotenv(".env.local")
@@ -14,7 +15,7 @@ server = AgentServer()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Keywords for each question to help with matching
 QUESTION_KEYWORDS = {
@@ -58,7 +59,7 @@ def detect_question_id(transcript: str) -> dict:
             
     return best_match
 
-async def save_response_to_supabase(session_id: str, question_id: str, question_text: str, response: str):
+async def save_response_to_supabase(supabase: AsyncClient, session_id: str, question_id: str, question_text: str, response: str):
     """
     Save interview response to Supabase.
     Stores all responses as-is.
@@ -71,7 +72,7 @@ async def save_response_to_supabase(session_id: str, question_id: str, question_
             "response": response,
         }
         
-        result = supabase.table("live_responses").insert(data).execute()
+        result = await supabase.table("live_responses").insert(data).execute()
         logger.info(f"Saved response to Supabase: Q{question_id} for session {session_id}")
         return result
     
@@ -83,7 +84,7 @@ class InsightAIAgent(Agent):
     def __init__(self):
         super().__init__(
             instructions=f"""
-            You are an expert market research assistant. Your name is **"InsightAI."**
+            You are an expert market research assistant. 
 
 Your objective is to complete this interview to gather insights about Rio biscuit. Please ask the following questions in order:
 
@@ -101,9 +102,10 @@ Your objective is to complete this interview to gather insights about Rio biscui
    * If the user’s answer is between 1 and 4, you must ask Question 6 (ask for the reason).
    * If the answer is 5 or above, skip Question 6 and ask Question 7.
 6. When all questions are completed, say "Thank you" and end the interview.
-7. Never repeat user's response back to them. 
+7. Never repeat the user's response back to them - Never say "You said [response]" or anything like that. Just listen and move on to the next question."
 8. Do not repeat a question unless respondent asks for clarity. 
 9. Be conversational, clear, and concise. 
+10. Do NOT thank the respondent after each response. Only thank them at the end after all questions are completed.
 
 Always wait for the user’s response and then ask the next question according to the logic.
 
@@ -112,6 +114,8 @@ Always wait for the user’s response and then ask the next question according t
 
 @server.rtc_session()
 async def my_agent(ctx: JobContext):
+    
+    supabase: AsyncClient = await acreate_client(SUPABASE_URL, SUPABASE_KEY)
     session_id = ctx.job.id
     
     logger.info(f"Starting InsightAI session {session_id} for room: {ctx.room.name}")
@@ -142,6 +146,7 @@ async def my_agent(ctx: JobContext):
     def on_user_input(event):
         
         if not event.is_final:
+            logger.info("Non-final transcription received, waiting for final result...")
             return
         
         transcript = event.transcript
@@ -152,6 +157,7 @@ async def my_agent(ctx: JobContext):
         if current_question and last_saved_response != transcript:
             asyncio.create_task(
                 save_response_to_supabase(
+                    supabase,
                     session_id,
                     current_question["id"],
                     current_question["text"],
@@ -163,6 +169,7 @@ async def my_agent(ctx: JobContext):
     @session.on("conversation_item_added")
     def on_conversation_item(event):
         if event.item.role == "assistant":
+            logger.info(f"LLM response ready at: {time.time()}")  # add this
             transcript = event.item.text_content.lower()
             
             nonlocal current_question
@@ -204,21 +211,3 @@ if __name__ == "__main__":
     cli.run_app(server)
     
     
-# """آپ ایک ماہر مارکیٹ ریسرچ اسسٹنٹ ہیں۔ آپ کا نام 'InsightAI' ہے۔
-
-# آپ کا مقصد یہ انٹرویو مکمل کرنا ہے۔ براہ کرم درج ذیل سوالات ترتیب سے پوچھیں:
-
-# سوالات:
-# {json.dumps(QUESTIONS, ensure_ascii=False)}
-
-# سخت قوانین (Logic Rules):
-# 1. ہمیشہ اردو میں بات کریں۔
-# 2. ایک وقت میں صرف ایک سوال پوچھیں۔
-# 3. سوالات کے جوابات سن کر پھر سوال پوچھیں، لیکن کبھی بھی جواب کو دہرانا نہیں ہے۔ صارف کے جوابات سنیں اور سمجھیں۔
-# 4. جب سوالات پوچھیں، تو ہر لفظ کی درست اور صاف تلفظ کی کوشش کریں۔
-# 5. سوال 5 کے بعد برانچنگ لاجک:
-#    - اگر صارف کا جواب 1 سے 4 کے درمیان ہو، تو سوال 6 (وجہ پوچھنا) لازمی پوچھیں۔
-#    - اگر جواب 5 یا اس سے اوپر ہو، تو سوال 6 کو چھوڑ دیں اور سوال 7 پوچھیں۔
-# 6. جب تمام سوالات مکمل ہو جائیں، تو 'شکریہ' کہہ کر انٹرویو ختم کریں۔
-
-# ہمیشہ صارف کے جوابات کا انتظار کریں اور پھر لاجک کے مطابق اگلا سوال پوچھیں۔"""
